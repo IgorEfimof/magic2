@@ -3,47 +3,173 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Магический квадрат 5×5 (дробные коэффициенты)</title>
+    <title>Магический квадрат 5×5 (букмекерский стиль)</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Arial', sans-serif;
+            background-color: #1a1a1a;
+            margin: 0;
+            padding: 20px;
+            color: #e0e0e0;
+            touch-action: manipulation;
         }
+        
+        .header {
+            color: #ffcc00;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .controls {
+            background-color: #2d2d2d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        label {
+            margin-right: 10px;
+            color: #b3b3b3;
+            font-size: 14px;
+        }
+        
+        input {
+            background-color: #3d3d3d;
+            border: 1px solid #4d4d4d;
+            color: #ffffff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            width: 100px;
+            font-size: 16px;
+            caret-color: #ffcc00;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #ffcc00;
+        }
+        
+        button {
+            background-color: #ffcc00;
+            color: #1a1a1a;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover, button:active {
+            background-color: #ffd633;
+        }
+        
         table {
             border-collapse: collapse;
-            margin: 20px auto;
+            margin: 0 auto;
+            background-color: #2d2d2d;
         }
+        
         td {
             width: 50px;
             height: 50px;
-            border: 1px solid #000;
+            border: 1px solid #4d4d4d;
             text-align: center;
             vertical-align: middle;
+            color: #ffffff;
+            font-weight: bold;
         }
-        input, button {
-            padding: 8px;
-            margin: 5px;
-        }
-        .controls {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        
         .result {
             text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #2d2d2d;
+            border-radius: 8px;
+            color: #ffcc00;
             font-weight: bold;
-            margin-top: 10px;
+        }
+        
+        td.highlight {
+            background-color: #3a3a3a;
+        }
+        
+        /* Стили для виртуальной клавиатуры */
+        .virtual-keyboard {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #2d2d2d;
+            padding: 10px;
+            border-top: 1px solid #4d4d4d;
+            z-index: 1000;
+        }
+        
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+        
+        .keyboard-key {
+            background-color: #3d3d3d;
+            color: white;
+            border: 1px solid #4d4d4d;
+            border-radius: 4px;
+            padding: 12px 15px;
+            margin: 0 3px;
+            font-size: 16px;
+            cursor: pointer;
+            user-select: none;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .keyboard-key:active {
+            background-color: #ffcc00;
+            color: #1a1a1a;
+        }
+        
+        .keyboard-key.wide {
+            width: 80px;
+        }
+        
+        .keyboard-key.extra-wide {
+            width: 120px;
+        }
+        
+        .keyboard-key.dark {
+            background-color: #252525;
         }
     </style>
 </head>
 <body>
-    <h1 style="text-align: center;">Магический квадрат 5×5 (дробные коэффициенты)</h1>
+    <div class="header">Магический квадрат 5×5</div>
     
     <div class="controls">
-        <label for="startNum">Начальное число:</label>
-        <input type="number" id="startNum" value="1.0" step="0.01">
+        <div class="control-group">
+            <label for="startNum">Начальное число:</label>
+            <input type="number" id="startNum" value="1.0" step="0.01" inputmode="none" readonly onfocus="showKeyboard(this)">
+        </div>
         
-        <label for="step">Шаг:</label>
-        <input type="number" id="step" value="1.0" step="0.01">
+        <div class="control-group">
+            <label for="step">Шаг:</label>
+            <input type="number" id="step" value="1.0" step="0.01" inputmode="none" readonly onfocus="showKeyboard(this)">
+        </div>
         
         <button onclick="generateMagicSquare()">Сгенерировать</button>
     </div>
@@ -52,7 +178,103 @@
     
     <div class="result" id="magicConstant"></div>
     
+    <!-- Виртуальная клавиатура -->
+    <div class="virtual-keyboard" id="virtualKeyboard">
+        <div class="keyboard-row">
+            <div class="keyboard-key" onclick="pressKey('7')">7</div>
+            <div class="keyboard-key" onclick="pressKey('8')">8</div>
+            <div class="keyboard-key" onclick="pressKey('9')">9</div>
+            <div class="keyboard-key dark" onclick="pressKey('backspace')">⌫</div>
+        </div>
+        <div class="keyboard-row">
+            <div class="keyboard-key" onclick="pressKey('4')">4</div>
+            <div class="keyboard-key" onclick="pressKey('5')">5</div>
+            <div class="keyboard-key" onclick="pressKey('6')">6</div>
+            <div class="keyboard-key dark" onclick="hideKeyboard()">Скрыть</div>
+        </div>
+        <div class="keyboard-row">
+            <div class="keyboard-key" onclick="pressKey('1')">1</div>
+            <div class="keyboard-key" onclick="pressKey('2')">2</div>
+            <div class="keyboard-key" onclick="pressKey('3')">3</div>
+            <div class="keyboard-key dark" onclick="pressKey('0')">0</div>
+        </div>
+        <div class="keyboard-row">
+            <div class="keyboard-key" onclick="pressKey('.')">.</div>
+            <div class="keyboard-key" onclick="pressKey('-')">-</div>
+            <div class="keyboard-key extra-wide" onclick="finishInput()">Готово</div>
+        </div>
+    </div>
+    
     <script>
+        let currentInput = null;
+        let keyboardVisible = false;
+        
+        function showKeyboard(inputElement) {
+            currentInput = inputElement;
+            document.getElementById('virtualKeyboard').style.display = 'block';
+            keyboardVisible = true;
+            // Прокручиваем страницу вниз, чтобы клавиатура была видна
+            window.scrollTo(0, document.body.scrollHeight);
+        }
+        
+        function hideKeyboard() {
+            document.getElementById('virtualKeyboard').style.display = 'none';
+            keyboardVisible = false;
+            if (currentInput) {
+                currentInput.blur();
+            }
+        }
+        
+        function finishInput() {
+            hideKeyboard();
+            // Можно добавить валидацию ввода здесь
+        }
+        
+        function pressKey(key) {
+            if (!currentInput) return;
+            
+            const currentValue = currentInput.value;
+            const selectionStart = currentInput.selectionStart;
+            const selectionEnd = currentInput.selectionEnd;
+            
+            if (key === 'backspace') {
+                if (selectionStart === selectionEnd && selectionStart > 0) {
+                    // Удаляем один символ перед курсором
+                    currentInput.value = currentValue.substring(0, selectionStart - 1) + currentValue.substring(selectionEnd);
+                    currentInput.selectionStart = currentInput.selectionEnd = selectionStart - 1;
+                } else if (selectionStart !== selectionEnd) {
+                    // Удаляем выделенный текст
+                    currentInput.value = currentValue.substring(0, selectionStart) + currentValue.substring(selectionEnd);
+                    currentInput.selectionStart = currentInput.selectionEnd = selectionStart;
+                }
+            } else if (key === '-') {
+                // Разрешаем минус только в начале
+                if (currentValue.indexOf('-') === -1 && (selectionStart === 0 || currentValue === '')) {
+                    currentInput.value = currentValue.substring(0, selectionStart) + '-' + currentValue.substring(selectionEnd);
+                    currentInput.selectionStart = currentInput.selectionEnd = selectionStart + 1;
+                }
+            } else if (key === '.') {
+                // Разрешаем только одну точку
+                if (currentValue.indexOf('.') === -1) {
+                    currentInput.value = currentValue.substring(0, selectionStart) + '.' + currentValue.substring(selectionEnd);
+                    currentInput.selectionStart = currentInput.selectionEnd = selectionStart + 1;
+                }
+            } else {
+                // Цифры
+                currentInput.value = currentValue.substring(0, selectionStart) + key + currentValue.substring(selectionEnd);
+                currentInput.selectionStart = currentInput.selectionEnd = selectionStart + 1;
+            }
+        }
+        
+        // Обработчик для закрытия клавиатуры при клике вне поля ввода
+        document.addEventListener('click', function(e) {
+            if (keyboardVisible && 
+                !e.target.classList.contains('keyboard-key') && 
+                e.target !== currentInput) {
+                hideKeyboard();
+            }
+        });
+        
         function generateMagicSquare() {
             const n = 5;
             const startNum = parseFloat(document.getElementById("startNum").value) || 1.0;
@@ -66,7 +288,7 @@
             
             for (let k = 0; k < n * n; k++) {
                 magicSquare[i][j] = currentNum;
-                currentNum = parseFloat((currentNum + step).toFixed(2)); // Округление до 2 знаков
+                currentNum = parseFloat((currentNum + step).toFixed(2));
                 
                 let nexti = (i - 1 + n) % n;
                 let nextj = (j + 1) % n;
@@ -87,7 +309,11 @@
                 const row = table.insertRow();
                 for (let j = 0; j < n; j++) {
                     const cell = row.insertCell();
-                    cell.textContent = magicSquare[i][j].toFixed(2); // Округление до 2 знаков
+                    cell.textContent = magicSquare[i][j].toFixed(2);
+                    
+                    if ((i + j) % 2 === 0) {
+                        cell.classList.add('highlight');
+                    }
                 }
             }
             
