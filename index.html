@@ -203,9 +203,16 @@
         </div>
         
         <div class="control-group">
+            <label for="secondNum">Второе число:</label>
+            <div class="input-wrapper">
+                <input type="text" class="input-field" id="secondNum" value="2.0" readonly onclick="showKeyboard(this)">
+            </div>
+        </div>
+        
+        <div class="control-group">
             <label for="step">Шаг:</label>
             <div class="input-wrapper">
-                <input type="text" class="input-field" id="step" value="1.0" readonly onclick="showKeyboard(this)">
+                <input type="text" class="input-field" id="step" value="1.0" readonly>
             </div>
         </div>
         
@@ -266,6 +273,7 @@
             keyboardVisible = false;
             if (currentInput) {
                 currentInput.blur();
+                calculateStep(); // Пересчитываем шаг после скрытия клавиатуры
             }
         }
         
@@ -291,6 +299,13 @@
             } else {
                 currentInput.value = currentValue + key;
             }
+        }
+        
+        function calculateStep() {
+            const startNum = parseFloat(document.getElementById("startNum").value) || 1.0;
+            const secondNum = parseFloat(document.getElementById("secondNum").value) || 2.0;
+            const step = secondNum - startNum;
+            document.getElementById("step").value = step.toFixed(2);
         }
         
         document.addEventListener('click', function(e) {
@@ -356,7 +371,6 @@
             document.getElementById("sqrtCalculation").innerHTML = 
                 `<p>Квадратный корень из магической константы: √${magicSum.toFixed(2)} ≈ ${sqrtMagicSum}</p>`;
             
-            // Находим число, наиболее близкое к квадратному корню
             let closestNum = null;
             let minDiff = Infinity;
             
@@ -427,7 +441,11 @@
             }
         }
         
-        window.onload = generateMagicSquare;
+        // Инициализация при загрузке
+        window.onload = function() {
+            calculateStep();
+            generateMagicSquare();
+        };
     </script>
 </body>
 </html>
