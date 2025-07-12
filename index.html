@@ -2,75 +2,85 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Магический квадрат 5×5</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Магический квадрат 5×5 (букмекерский стиль)</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
             background-color: #1a1a1a;
             margin: 0;
-            padding: 10px;
+            padding: 20px;
             color: #e0e0e0;
             touch-action: manipulation;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
         
         .header {
             color: #ffcc00;
             text-align: center;
-            margin-bottom: 10px;
-            font-size: 18px;
+            margin-bottom: 20px;
+            font-size: 24px;
             font-weight: bold;
         }
         
         .controls {
             background-color: #2d2d2d;
-            padding: 10px;
+            padding: 15px;
             border-radius: 8px;
-            margin-bottom: 10px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-            gap: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
         }
         
         .control-group {
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            position: relative;
         }
         
         label {
+            margin-right: 10px;
             color: #b3b3b3;
-            font-size: 12px;
-            margin-bottom: 3px;
+            font-size: 14px;
+        }
+        
+        .input-wrapper {
+            position: relative;
         }
         
         .input-field {
             background-color: #3d3d3d;
             border: 1px solid #4d4d4d;
             color: #ffffff;
-            padding: 6px 8px;
+            padding: 8px 12px;
             border-radius: 4px;
-            font-size: 14px;
+            width: 100px;
+            font-size: 16px;
             caret-color: transparent;
         }
         
+        .input-field:focus {
+            outline: none;
+            border-color: #ffcc00;
+        }
+        
         .buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
             gap: 10px;
-            grid-column: 1 / -1;
+            width: 100%;
         }
         
         button {
             background-color: #ffcc00;
             color: #1a1a1a;
             border: none;
-            padding: 8px;
+            padding: 8px 20px;
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
+            transition: background-color 0.3s;
+            flex: 1;
         }
         
         button.clear {
@@ -78,64 +88,63 @@
             color: white;
         }
         
-        .table-container {
-            overflow: auto;
-            margin: 0 auto;
-            width: 100%;
-            max-width: 280px;
+        button:hover, button:active {
+            background-color: #ffd633;
         }
         
         table {
             border-collapse: collapse;
-            width: 100%;
-            background-color: #2d2d2d;
             margin: 0 auto;
+            background-color: #2d2d2d;
         }
         
         td {
-            width: 20%;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border: 1px solid #4d4d4d;
             text-align: center;
-            font-size: 12px;
+            vertical-align: middle;
             color: #ffffff;
             font-weight: bold;
-            padding: 2px;
         }
         
         .result {
             text-align: center;
-            margin: 10px 0;
-            padding: 8px;
+            margin-top: 20px;
+            padding: 10px;
             background-color: #2d2d2d;
             border-radius: 8px;
             color: #ffcc00;
-            font-size: 12px;
+            font-weight: bold;
         }
         
         .calculations {
             background-color: #2d2d2d;
-            padding: 10px;
+            padding: 15px;
             border-radius: 8px;
-            margin-top: 10px;
-            font-size: 12px;
-            flex: 1;
-            overflow-y: auto;
+            margin-top: 20px;
+            color: #e0e0e0;
         }
         
         .calculations h3 {
             color: #ffcc00;
-            margin: 5px 0;
-            font-size: 14px;
+            margin-top: 0;
         }
         
-        td.highlight { background-color: #3a3a3a; }
-        td.target-match { 
-            background-color: #4CAF50; 
+        td.highlight {
+            background-color: #3a3a3a;
+        }
+        
+        td.target-match {
+            background-color: #4CAF50;
             color: white;
             animation: pulse 2s infinite;
         }
-        td.sqrt-highlight { background-color: #f44336; color: white; }
+        
+        td.sqrt-highlight {
+            background-color: #f44336;
+            color: white;
+        }
         
         @keyframes pulse {
             0% { background-color: #4CAF50; }
@@ -158,7 +167,7 @@
         .keyboard-row {
             display: flex;
             justify-content: center;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
         }
         
         .keyboard-key {
@@ -166,11 +175,12 @@
             color: white;
             border: 1px solid #4d4d4d;
             border-radius: 4px;
-            padding: 8px 12px;
-            margin: 0 2px;
-            font-size: 14px;
+            padding: 12px 15px;
+            margin: 0 3px;
+            font-size: 16px;
             cursor: pointer;
-            min-width: 30px;
+            user-select: none;
+            min-width: 40px;
             text-align: center;
         }
         
@@ -180,11 +190,11 @@
         }
         
         .keyboard-key.wide {
-            width: 60px;
+            width: 80px;
         }
         
         .keyboard-key.extra-wide {
-            width: 80px;
+            width: 120px;
         }
         
         .keyboard-key.dark {
@@ -198,17 +208,23 @@
     <div class="controls">
         <div class="control-group">
             <label for="startNum">Начальное число:</label>
-            <input type="text" class="input-field" id="startNum" value="1.0" readonly onclick="showKeyboard(this)">
+            <div class="input-wrapper">
+                <input type="text" class="input-field" id="startNum" value="1.0" readonly onclick="showKeyboard(this)">
+            </div>
         </div>
         
         <div class="control-group">
             <label for="secondNum">Второе число:</label>
-            <input type="text" class="input-field" id="secondNum" value="2.0" readonly onclick="showKeyboard(this)">
+            <div class="input-wrapper">
+                <input type="text" class="input-field" id="secondNum" value="2.0" readonly onclick="showKeyboard(this)">
+            </div>
         </div>
         
         <div class="control-group">
             <label for="step">Шаг:</label>
-            <input type="text" class="input-field" id="step" value="1.0" readonly>
+            <div class="input-wrapper">
+                <input type="text" class="input-field" id="step" value="1.0" readonly>
+            </div>
         </div>
         
         <div class="buttons">
@@ -217,9 +233,7 @@
         </div>
     </div>
     
-    <div class="table-container">
-        <table id="magicSquare"></table>
-    </div>
+    <table id="magicSquare"></table>
     
     <div class="result" id="magicConstant"></div>
     
@@ -264,6 +278,11 @@
             currentInput = inputElement;
             document.getElementById('virtualKeyboard').style.display = 'block';
             keyboardVisible = true;
+            
+            // Очищаем поле при первом нажатии, если это значение по умолчанию
+            if (currentInput.value === "1.0" || currentInput.value === "2.0") {
+                currentInput.value = "";
+            }
         }
         
         function hideKeyboard() {
@@ -276,58 +295,107 @@
         }
         
         function finishInput() {
-            hideKeyboard();
+            formatCurrentInput();
+            moveToNextField();
         }
         
         function pressKey(key) {
             if (!currentInput) return;
             
-            const currentValue = currentInput.value;
+            let currentValue = currentInput.value;
             
             if (key === 'backspace') {
                 currentInput.value = currentValue.slice(0, -1);
+                return;
             } else if (key === '-') {
                 if (currentValue.indexOf('-') === -1) {
                     currentInput.value = '-' + currentValue;
                 }
+                return;
             } else if (key === '.') {
                 if (currentValue.indexOf('.') === -1) {
                     currentInput.value = currentValue + '.';
                 }
+                return;
+            }
+            
+            // Автоматическое добавление точки после первой цифры
+            if (/^-?\d$/.test(currentValue) {
+                currentInput.value = currentValue + '.';
+            }
+            
+            // Ограничиваем ввод до формата X.XX
+            if (/^-?\d\.\d{2}$/.test(currentInput.value)) {
+                formatCurrentInput();
+                moveToNextField();
+                return;
+            }
+            
+            // Добавляем цифру, если есть место
+            if (!/^-?\d\.\d{2}$/.test(currentInput.value)) {
+                currentInput.value += key;
+            }
+            
+            // Проверяем, нужно ли автоматически форматировать и переходить
+            if (/^-?\d\.\d{2}$/.test(currentInput.value)) {
+                formatCurrentInput();
+                moveToNextField();
+            }
+        }
+        
+        function formatCurrentInput() {
+            if (!currentInput) return;
+            
+            // Форматируем число с двумя знаками после запятой
+            let num = parseFloat(currentInput.value);
+            if (!isNaN(num)) {
+                currentInput.value = num.toFixed(2);
             } else {
-                currentInput.value = currentValue + key;
+                currentInput.value = "1.00";
+            }
+        }
+        
+        function moveToNextField() {
+            if (!currentInput) return;
+            
+            const fields = ['startNum', 'secondNum', 'step'];
+            const currentIndex = fields.indexOf(currentInput.id);
+            
+            if (currentIndex < fields.length - 1) {
+                const nextField = document.getElementById(fields[currentIndex + 1]);
+                nextField.focus();
+                showKeyboard(nextField);
+            } else {
+                hideKeyboard();
             }
         }
         
         function calculateStep() {
-            const startNum = parseFloat(document.getElementById("startNum").value) || 1.0;
-            const secondNum = parseFloat(document.getElementById("secondNum").value) || 2.0;
-            const step = secondNum - startNum;
-            document.getElementById("step").value = step.toFixed(2);
+            const startNum = parseFloat(document.getElementById("startNum").value) || 0;
+            const secondNum = parseFloat(document.getElementById("secondNum").value) || 0;
+            
+            if (startNum && secondNum) {
+                const step = secondNum - startNum;
+                document.getElementById("step").value = step.toFixed(2);
+            }
         }
         
         function clearAll() {
-            // Очищаем поля ввода
-            document.getElementById("startNum").value = "";
-            document.getElementById("secondNum").value = "";
-            document.getElementById("step").value = "";
-            
-            // Очищаем таблицу
+            document.getElementById("startNum").value = "1.0";
+            document.getElementById("secondNum").value = "2.0";
+            document.getElementById("step").value = "1.0";
             document.getElementById("magicSquare").innerHTML = "";
-            
-            // Очищаем результаты
             document.getElementById("magicConstant").textContent = "";
             document.getElementById("sqrtCalculation").innerHTML = "";
             document.getElementById("numberSearchResults").innerHTML = "";
-            
-            // Сбрасываем текущий квадрат
             currentMagicSquare = [];
         }
         
         document.addEventListener('click', function(e) {
             if (keyboardVisible && 
                 !e.target.classList.contains('keyboard-key') && 
-                e.target !== currentInput) {
+                !e.target.classList.contains('input-field') &&
+                e.target.tagName !== 'LABEL') {
                 hideKeyboard();
             }
         });
@@ -358,33 +426,34 @@
             }
             
             currentMagicSquare = magicSquare;
-            renderSquare(magicSquare);
+            
+            const table = document.getElementById("magicSquare");
+            table.innerHTML = "";
+            
+            for (let i = 0; i < n; i++) {
+                const row = table.insertRow();
+                for (let j = 0; j < n; j++) {
+                    const cell = row.insertCell();
+                    cell.textContent = magicSquare[i][j].toFixed(2);
+                    
+                    if ((i + j) % 2 === 0) {
+                        cell.classList.add('highlight');
+                    }
+                }
+            }
             
             const magicSum = n * (2 * startNum + (n * n - 1) * step) / 2;
             document.getElementById("magicConstant").textContent = 
-                `Магическая константа: ${magicSum.toFixed(2)}`;
+                `Магическая константа (сумма строк/столбцов/диагоналей): ${magicSum.toFixed(2)}`;
             
             calculateSquareRoot(magicSum);
             findTargetNumbers(magicSquare, startNum, step);
         }
         
-        function renderSquare(square) {
-            const table = document.getElementById("magicSquare");
-            table.innerHTML = "";
-            
-            for (let i = 0; i < 5; i++) {
-                const row = table.insertRow();
-                for (let j = 0; j < 5; j++) {
-                    const cell = row.insertCell();
-                    cell.textContent = square[i][j].toFixed(2);
-                    if ((i + j) % 2 === 0) cell.classList.add('highlight');
-                }
-            }
-        }
-        
         function calculateSquareRoot(magicSum) {
             const sqrtMagicSum = Math.sqrt(magicSum).toFixed(2);
-            let content = `<p>√${magicSum.toFixed(2)} ≈ ${sqrtMagicSum}</p>`;
+            document.getElementById("sqrtCalculation").innerHTML = 
+                `<p>Квадратный корень из магической константы: √${magicSum.toFixed(2)} ≈ ${sqrtMagicSum}</p>`;
             
             let closestNum = null;
             let minDiff = Infinity;
@@ -401,12 +470,12 @@
             }
             
             if (closestNum) {
-                content += `<p>Ближайшее: ${closestNum.value.toFixed(2)} (строка ${closestNum.row + 1}, столбец ${closestNum.col + 1})</p>`;
+                document.getElementById("sqrtCalculation").innerHTML += 
+                    `<p>Ближайшее число в матрице: ${closestNum.value.toFixed(2)} (строка ${closestNum.row + 1}, столбец ${closestNum.col + 1})</p>`;
+                
                 const table = document.getElementById("magicSquare");
                 table.rows[closestNum.row].cells[closestNum.col].classList.add('sqrt-highlight');
             }
-            
-            document.getElementById("sqrtCalculation").innerHTML = content;
         }
         
         function findTargetNumbers(magicSquare, startNum, step) {
@@ -414,6 +483,8 @@
             const startNumPlusStep = startNum + step;
             const tolerance = 0.05;
             let foundNumbers = [];
+            
+            document.getElementById("numberSearchResults").innerHTML = "";
             
             for (let i = 0; i < magicSquare.length; i++) {
                 for (let j = 0; j < magicSquare[i].length; j++) {
@@ -438,16 +509,17 @@
             const resultsDiv = document.getElementById("numberSearchResults");
             
             if (foundNumbers.length > 0) {
-                let content = `<p>Найдено чисел (2.05, 2.15, 2.45, 2.60, 2.75 ±0.05):</p><ul>`;
+                resultsDiv.innerHTML += `<p>Найдено чисел (2.05, 2.15, 2.45, 2.60, 2.75 ±0.05):</p><ul>`;
                 
                 foundNumbers.forEach(item => {
-                    content += `<li>${item.value.toFixed(2)} (близко к ${item.target}) в строке ${item.row + 1}, столбце ${item.col + 1}</li>`;
+                    resultsDiv.innerHTML += 
+                        `<li>${item.value.toFixed(2)} (близко к ${item.target}) в строке ${item.row + 1}, столбце ${item.col + 1}</li>`;
                     
                     const table = document.getElementById("magicSquare");
                     table.rows[item.row].cells[item.col].classList.add('target-match');
                 });
                 
-                resultsDiv.innerHTML = content + "</ul>";
+                resultsDiv.innerHTML += "</ul>";
             } else {
                 resultsDiv.innerHTML = "<p>Целевые числа не найдены (с отклонением ±0.05).</p>";
             }
