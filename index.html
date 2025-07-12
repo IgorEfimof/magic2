@@ -123,14 +123,21 @@
             background-color: #3a3a3a;
         }
         
-        td.special {
+        td.target-match {
             background-color: #4CAF50;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+        
+        td.sqrt-highlight {
+            background-color: #f44336;
             color: white;
         }
         
-        td.target {
-            background-color: #f44336;
-            color: white;
+        @keyframes pulse {
+            0% { background-color: #4CAF50; }
+            50% { background-color: #45a049; }
+            100% { background-color: #4CAF50; }
         }
         
         /* Стили для виртуальной клавиатуры */
@@ -212,7 +219,7 @@
     <div class="calculations">
         <h3>Дополнительные расчеты</h3>
         <div id="sqrtCalculation"></div>
-        <div id="numberSearch"></div>
+        <div id="numberSearchResults"></div>
     </div>
     
     <!-- Виртуальная клавиатура -->
@@ -251,7 +258,6 @@
             currentInput = inputElement;
             document.getElementById('virtualKeyboard').style.display = 'block';
             keyboardVisible = true;
-            // Прокручиваем страницу вниз, чтобы клавиатура была видна
             window.scrollTo(0, document.body.scrollHeight);
         }
         
@@ -265,7 +271,6 @@
         
         function finishInput() {
             hideKeyboard();
-            // Можно добавить валидацию ввода здесь
         }
         
         function pressKey(key) {
@@ -288,7 +293,6 @@
             }
         }
         
-        // Обработчик для закрытия клавиатуры при клике вне поля ввода
         document.addEventListener('click', function(e) {
             if (keyboardVisible && 
                 !e.target.classList.contains('keyboard-key') && 
@@ -304,7 +308,6 @@
             
             let magicSquare = Array(n).fill().map(() => Array(n).fill(0));
             
-            // Алгоритм Сиамского метода (для нечётных n)
             let i = 0, j = Math.floor(n / 2);
             let currentNum = startNum;
             
@@ -323,10 +326,8 @@
                 }
             }
             
-            // Сохраняем текущий квадрат для дальнейшего использования
             currentMagicSquare = magicSquare;
             
-            // Отображение в таблице
             const table = document.getElementById("magicSquare");
             table.innerHTML = "";
             
@@ -342,97 +343,90 @@
                 }
             }
             
-            // Расчёт магической константы
             const magicSum = n * (2 * startNum + (n * n - 1) * step) / 2;
             document.getElementById("magicConstant").textContent = 
                 `Магическая константа (сумма строк/столбцов/диагоналей): ${magicSum.toFixed(2)}`;
             
-            // Дополнительные расчеты
-            performAdditionalCalculations(magicSquare, magicSum, startNum, step);
+            calculateSquareRoot(magicSum);
+            findTargetNumbers(magicSquare, startNum, step);
         }
         
-        function performAdditionalCalculations(magicSquare, magicSum, startNum, step) {
-            // 1. Квадратный корень из магической константы
+        function calculateSquareRoot(magicSum) {
             const sqrtMagicSum = Math.sqrt(magicSum).toFixed(2);
             document.getElementById("sqrtCalculation").innerHTML = 
                 `<p>Квадратный корень из магической константы: √${magicSum.toFixed(2)} ≈ ${sqrtMagicSum}</p>`;
             
-            // 2. Поиск указанных чисел в матрице
+            // Находим число, наиболее близкое к квадратному корню
+            let closestNum = null;
+            let minDiff = Infinity;
+            
+            for (let i = 0; i < currentMagicSquare.length; i++) {
+                for (let j = 0; j < currentMagicSquare[i].length; j++) {
+                    const num = currentMagicSquare[i][j];
+                    const diff = Math.abs(num - sqrtMagicSum);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closestNum = { value: num, row: i, col: j };
+                    }
+                }
+            }
+            
+            if (closestNum) {
+                document.getElementById("sqrtCalculation").innerHTML += 
+                    `<p>Ближайшее число в матрице: ${closestNum.value.toFixed(2)} (строка ${closestNum.row + 1}, столбец ${closestNum.col + 1})</p>`;
+                
+                const table = document.getElementById("magicSquare");
+                table.rows[closestNum.row].cells[closestNum.col].classList.add('sqrt-highlight');
+            }
+        }
+        
+        function findTargetNumbers(magicSquare, startNum, step) {
             const targetNumbers = [2.05, 2.15, 2.45, 2.60, 2.75];
             const startNumPlusStep = startNum + step;
+            const tolerance = 0.05;
             let foundNumbers = [];
             
-            // Ищем числа в матрице (кроме начального и начального + шаг)
+            document.getElementById("numberSearchResults").innerHTML = "";
+            
             for (let i = 0; i < magicSquare.length; i++) {
                 for (let j = 0; j < magicSquare[i].length; j++) {
                     const num = magicSquare[i][j];
-                    if (num !== startNum && num !== startNumPlusStep) {
-                        // Проверяем, есть ли число в списке targetNumbers
-                        const found = targetNumbers.find(t => Math.abs(t - num) < 0.01);
-                        if (found) {
+                    
+                    if (num === startNum || num === startNumPlusStep) continue;
+                    
+                    for (const target of targetNumbers) {
+                        if (Math.abs(num - target) <= tolerance) {
                             foundNumbers.push({
                                 value: num,
+                                target: target,
                                 row: i,
                                 col: j
                             });
+                            break;
                         }
                     }
                 }
             }
             
-            // Выводим результаты поиска
-            let searchResults = "<p>Поиск чисел: 2.05, 2.15, 2.45, 2.60, 2.75 (кроме начального и начального+шаг):</p>";
+            const resultsDiv = document.getElementById("numberSearchResults");
             
             if (foundNumbers.length > 0) {
-                searchResults += "<ul>";
-                foundNumbers.forEach(item => {
-                    searchResults += `<li>Число ${item.value.toFixed(2)} найдено в строке ${item.row + 1}, столбце ${item.col + 1}</li>`;
-                });
-                searchResults += "</ul>";
+                resultsDiv.innerHTML += `<p>Найдено чисел (2.05, 2.15, 2.45, 2.60, 2.75 ±0.05):</p><ul>`;
                 
-                // Подсвечиваем найденные числа в таблице
-                const table = document.getElementById("magicSquare");
                 foundNumbers.forEach(item => {
-                    table.rows[item.row].cells[item.col].classList.add('special');
+                    resultsDiv.innerHTML += 
+                        `<li>${item.value.toFixed(2)} (близко к ${item.target}) в строке ${item.row + 1}, столбце ${item.col + 1}</li>`;
+                    
+                    const table = document.getElementById("magicSquare");
+                    table.rows[item.row].cells[item.col].classList.add('target-match');
                 });
+                
+                resultsDiv.innerHTML += "</ul>";
             } else {
-                searchResults += "<p>Указанные числа не найдены в матрице.</p>";
-            }
-            
-            document.getElementById("numberSearch").innerHTML = searchResults;
-            
-            // 3. Находим число, наиболее близкое к квадратному корню из магической константы
-            let closestNumber = null;
-            let minDiff = Infinity;
-            
-            for (let i = 0; i < magicSquare.length; i++) {
-                for (let j = 0; j < magicSquare[i].length; j++) {
-                    const num = magicSquare[i][j];
-                    const diff = Math.abs(num - sqrtMagicSum);
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        closestNumber = {
-                            value: num,
-                            row: i,
-                            col: j
-                        };
-                    }
-                }
-            }
-            
-            if (closestNumber) {
-                const sqrtInfo = document.createElement('p');
-                sqrtInfo.innerHTML = `Число, наиболее близкое к квадратному корню (${sqrtMagicSum}): 
-                    ${closestNumber.value.toFixed(2)} (строка ${closestNumber.row + 1}, столбец ${closestNumber.col + 1})`;
-                document.getElementById("sqrtCalculation").appendChild(sqrtInfo);
-                
-                // Подсвечиваем это число в таблице
-                const table = document.getElementById("magicSquare");
-                table.rows[closestNumber.row].cells[closestNumber.col].classList.add('target');
+                resultsDiv.innerHTML = "<p>Целевые числа не найдены (с отклонением ±0.05).</p>";
             }
         }
         
-        // Генерация при загрузке
         window.onload = generateMagicSquare;
     </script>
 </body>
