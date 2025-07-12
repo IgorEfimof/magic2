@@ -56,6 +56,13 @@
             caret-color: transparent;
         }
         
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            grid-column: 1 / -1;
+        }
+        
         button {
             background-color: #ffcc00;
             color: #1a1a1a;
@@ -64,7 +71,11 @@
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
-            grid-column: 1 / -1;
+        }
+        
+        button.clear {
+            background-color: #f44336;
+            color: white;
         }
         
         .table-container {
@@ -200,7 +211,10 @@
             <input type="text" class="input-field" id="step" value="1.0" readonly>
         </div>
         
-        <button onclick="generateMagicSquare()">Сгенерировать</button>
+        <div class="buttons">
+            <button onclick="generateMagicSquare()">Сгенерировать</button>
+            <button class="clear" onclick="clearAll()">Очистить</button>
+        </div>
     </div>
     
     <div class="table-container">
@@ -290,6 +304,24 @@
             const secondNum = parseFloat(document.getElementById("secondNum").value) || 2.0;
             const step = secondNum - startNum;
             document.getElementById("step").value = step.toFixed(2);
+        }
+        
+        function clearAll() {
+            // Очищаем поля ввода
+            document.getElementById("startNum").value = "";
+            document.getElementById("secondNum").value = "";
+            document.getElementById("step").value = "";
+            
+            // Очищаем таблицу
+            document.getElementById("magicSquare").innerHTML = "";
+            
+            // Очищаем результаты
+            document.getElementById("magicConstant").textContent = "";
+            document.getElementById("sqrtCalculation").innerHTML = "";
+            document.getElementById("numberSearchResults").innerHTML = "";
+            
+            // Сбрасываем текущий квадрат
+            currentMagicSquare = [];
         }
         
         document.addEventListener('click', function(e) {
